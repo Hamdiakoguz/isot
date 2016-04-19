@@ -105,7 +105,8 @@ module Isot
     end
 
     def parse_service_name
-
+      service_name = root["name"]?
+      @service_name = service_name.to_s if service_name
     end
 
     def parse_messages
