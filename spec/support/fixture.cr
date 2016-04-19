@@ -35,6 +35,12 @@ class Fixture
   def read
     Fixture[filename] ||= File.read(path)
   end
+
+  def parse
+    parser = Isot::Parser.new(XML.parse(read))
+    parser.parse
+    parser
+  end
 end
 
 def fixture(*args)
