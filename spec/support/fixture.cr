@@ -37,6 +37,7 @@ class Fixture
   end
 
   def parse
+    Isot.debug("Parsing fixture: #{filename}.", "Fixture")
     parser = Isot::Parser.new(XML.parse(read))
     parser.parse
     parser

@@ -41,12 +41,18 @@ module Isot
     getter element_form_default : String
 
     def initialize(@document)
+      debug("Initializing parser.")
       @namespace = ""
       @namespaces = {} of String => String
       @operations = {} of String => Hash(Symbol, String)
       @endpoint = URI.new
       @service_name = ""
       @element_form_default = "unqualified"
+
+      @sections = {} of String => Array(XML::Node)
+    end
+
+    class Error < Exception
     end
 
     def parse
@@ -60,6 +66,9 @@ module Isot
       parse_operations_parameters
       parse_types
       parse_deferred_types
+    rescue e
+      debug("Parse error. #{e.inspect_with_backtrace}")
+      raise Error.new "WSDL parse error.", e
     end
 
     def parse_namespaces
@@ -136,6 +145,8 @@ module Isot
 
     def sections
 
+    private def debug(message)
+      Isot.debug(message, "Isot::Parser")
     end
   end
 end
