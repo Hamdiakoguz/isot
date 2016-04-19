@@ -50,6 +50,9 @@ module Isot
       @element_form_default = "unqualified"
 
       @sections = {} of String => Array(XML::Node)
+      @messages = {} of String => XML::Node
+      @port_types = {} of String => XML::Node
+      @port_type_operations = {} of String => Hash(String, XML::Node)
     end
 
     class Error < Exception
@@ -109,16 +112,30 @@ module Isot
       @service_name = service_name.to_s if service_name
     end
 
-    def parse_messages
+    def parse_nodes_with_name(root_node : XML::Node, name : String)
+      hash = {} of String => XML::Node
+      root_node.children.each do |node|
+        if node.name == name
+          hash[node["name"].not_nil!] = node
+        end
+      end
+      hash
+    end
 
+    def parse_messages
+      @messages = parse_nodes_with_name(root, "message")
     end
 
     def parse_port_types
-
+      @port_types = parse_nodes_with_name(root, "portType")
     end
 
     def parse_port_type_operations
+      @port_type_operations = {} of String => Hash(String, XML::Node)
 
+      @port_types.each do |port_type_name, port_type|
+        @port_type_operations[port_type_name] = parse_nodes_with_name(port_type, "operation")
+      end
     end
 
     def parse_operations_parameters
