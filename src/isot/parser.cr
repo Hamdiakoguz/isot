@@ -72,15 +72,36 @@ module Isot
     end
 
     def parse_namespaces
+      debug("Parsing namespaces.")
+      element_form_default = schemas.first?.try &.["elementFormDefault"]?
+      @element_form_default = element_form_default.to_s if element_form_default
+      debug("@element_form_default: #{@element_form_default}")
 
+      namespace = root["targetNamespace"]
+      @namespace = namespace.to_s if namespace
+      debug("@namespace: #{@namespace}")
+
+      @namespaces = {} of String => String
+      root.namespaces.each do |key, value|
+        @namespaces[key.sub("xmlns:", "")] = value.to_s
+      end
     end
 
     def parse_endpoint
+      if service_node = service
+        endpoint = service_node.xpath_node(".//soap11:address/@location", namespaces: {"soap11": SOAP_1_1})
+        endpoint ||= service_node.xpath_node(".//soap12:address/@location", namespaces: {"soap12": SOAP_1_2})
+      end
 
+      @endpoint = parse_url(endpoint.content) if endpoint
     end
 
     def parse_url(url)
-
+      unescaped_url = URI.unescape(url.to_s)
+      escaped_url   = URI.escape(unescaped_url)
+      URI.parse(escaped_url)
+    rescue URI::Error
+      URI.new
     end
 
     def parse_service_name
@@ -132,18 +153,32 @@ module Isot
     end
 
     def schemas
-
+      types = section("types").try &.first?
+      types ? types.children : [] of XML::Node
     end
 
     def service
-
+      services = section("service")
+      services.first? if services  # service nodes could be imported?
     end
 
     def section(section_name)
-
+      sections[section_name]?
     end
 
     def sections
+      return @sections if @sections.any?
+
+      root.children.each do |node|
+        (@sections[node.name] ||= [] of XML::Node) << node
+      end
+
+      @sections
+    end
+
+    def root
+      document.root.not_nil!
+    end
 
     private def debug(message)
       Isot.debug(message, "Isot::Parser")
