@@ -5,7 +5,7 @@ describe Isot::Parser do
     subject = fixture(:marketo).parse
 
     it "parses the operations" do
-      subject.operations[:get_lead][:input].should eq("paramsGetLead")
+      subject.operations["get_lead"].input.should eq("paramsGetLead")
     end
   end
 end

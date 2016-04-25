@@ -5,7 +5,11 @@ describe Isot::Parser do
     subject = fixture(:tradetracker).parse
 
     it "parses the operations" do
-      subject.operations[:get_feeds][:input].should eq({"getFeeds" => {"affiliateSiteID"=>["xsd", "nonNegativeInteger"], "options"=>["tns", "FeedFilter"]}})
+      first, second = subject.operations["get_feeds"].input
+      first.name.should eq("affiliateSiteID")
+      first.type.should eq("xsd:nonNegativeInteger")
+      second.name.should eq("options")
+      second.type.should eq("tns:FeedFilter")
     end
   end
 end
