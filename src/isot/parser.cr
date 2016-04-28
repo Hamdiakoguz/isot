@@ -293,14 +293,14 @@ module Isot
     end
   end
 
-  class Operation
+  struct Operation
     getter name : String
     getter action : String
-    getter input : Array(Message)
-    getter output : Array(Message)?
+    getter inputs : Array(Message)
+    getter outputs : Array(Message)?
     getter namespace_identifier : String?
 
-    def initialize(@name, @action, @input, @output = nil, @namespace_identifier = nil)
+    def initialize(@name, @action, @inputs, @outputs = nil, @namespace_identifier = nil)
     end
   end
 
@@ -309,7 +309,7 @@ module Isot
   # Messages consist of one or more part elements, where each part is associated with either
   # an element (when using document style) or
   # a type (when using RPC style).
-  class Message
+  struct Message
     getter name : String
     getter type : String?
     getter element : String?
