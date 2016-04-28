@@ -155,8 +155,8 @@ module Isot
         soap_action = soap_operation.attributes["soapAction"]? if soap_operation
 
         if soap_action
-          soap_action = soap_action.to_s
-          action = soap_action && !soap_action.empty? ? soap_action.to_s : name
+          soap_action = soap_action.content
+          action = soap_action && !soap_action.empty? ? soap_action : name
 
           # There should be a matching portType for each binding, so we will lookup the input from there.
           namespace_id, output = output_for(operation)

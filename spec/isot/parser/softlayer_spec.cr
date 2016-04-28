@@ -5,8 +5,12 @@ describe Isot::Parser do
     subject = fixture(:brand).parse
 
     it "parses the operations" do
-      subject.operations["create_object"].input.should eq({"createObject" => { "templateObject" => ["tns", "SoftLayer_Brand"] }})
-      subject.operations["create_customer_account"].input.should eq({"createCustomerAccount" => {"account" => ["tns", "SoftLayer_Account"], "bypassDuplicateAccountCheck" => ["xsd", "boolean"]}})
+      create_object_input = subject.operations["create_object"].inputs.first
+      create_object_input.should eq(Isot::Message.new("templateObject", type: "tns:SoftLayer_Brand"))
+
+      create_customer_account_input = subject.operations["create_customer_account"].inputs
+      create_customer_account_input[0].should eq(Isot::Message.new("account", type: "tns:SoftLayer_Account"))
+      create_customer_account_input[1].should eq(Isot::Message.new("bypassDuplicateAccountCheck", type: "xsd:boolean"))
     end
   end
 end
