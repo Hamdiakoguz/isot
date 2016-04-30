@@ -2,6 +2,8 @@
 
 A simple WSDL parser in crystal. Ported from [wasabi](https://github.com/savonrb/wasabi) ruby gem.
 
+[![Build Status](https://travis-ci.org/Hamdiakoguz/isot.svg?branch=master)](https://travis-ci.org/Hamdiakoguz/isot)
+
 ## Usage
 
 TODO: Write usage instructions here
