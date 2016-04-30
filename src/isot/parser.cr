@@ -248,7 +248,7 @@ module Isot
     def parse_types
       debug("Parse types.")
       schemas.each do |schema|
-        schema_namespace = schema.attributes["targetNamespace"].content unless schema.attributes.empty?
+        schema_namespace = schema["targetNamespace"]?
         schema.children.each do |node|
           namespace = schema_namespace || @namespace
 
