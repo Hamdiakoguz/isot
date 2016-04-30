@@ -138,6 +138,21 @@ module Isot
     end
 
     def parse_operations_parameters
+      root_elements = document.xpath_nodes("wsdl:definitions/wsdl:types/*[local-name()='schema']/*[local-name()='element']", namespaces: {"wsdl": WSDL}).each do |element|
+        name = element["name"]?
+        if name
+          name = Isot::CoreExt::String.snakecase(name)
+
+          if operation = @operations[name]?
+            element.xpath_nodes("*[local-name() ='complexType']/*[local-name() ='sequence']/*[local-name() ='element']").each do |child_element|
+              attr_name = child_element["name"].not_nil!
+              attr_type = (attr_type = child_element["type"].not_nil!.split(':')).size > 1 ? attr_type[1] : attr_type[0]
+
+              operation.parameters << Parameter.new(attr_name, attr_type)
+            end
+          end
+        end
+      end
     end
 
     def parse_operations
@@ -308,8 +323,17 @@ module Isot
     getter inputs : Array(Message)
     getter outputs : Array(Message)?
     getter namespace_identifier : String?
+    property parameters : Array(Parameter)
 
-    def initialize(@name, @action, @inputs, @outputs = nil, @namespace_identifier = nil)
+    def initialize(@name, @action, @inputs, @outputs = nil, @namespace_identifier = nil, @parameters = [] of Parameter)
+    end
+  end
+
+  struct Parameter
+    getter name : String
+    getter type : String
+
+    def initialize(@name, @type)
     end
   end
 
