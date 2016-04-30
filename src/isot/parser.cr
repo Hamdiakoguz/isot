@@ -3,12 +3,10 @@ require "uri"
 require "./core_ext/string"
 
 module Isot
-
   # = Isot::Parser
   #
   # Parses WSDL documents and remembers their important parts.
   class Parser
-
     XSD      = "http://www.w3.org/2001/XMLSchema"
     WSDL     = "http://schemas.xmlsoap.org/wsdl/"
     SOAP_1_1 = "http://schemas.xmlsoap.org/wsdl/soap/"
@@ -102,7 +100,7 @@ module Isot
 
     def parse_url(url)
       unescaped_url = URI.unescape(url.to_s)
-      escaped_url   = URI.escape(unescaped_url)
+      escaped_url = URI.escape(unescaped_url)
       URI.parse(escaped_url)
     rescue URI::Error
       URI.new
@@ -140,7 +138,6 @@ module Isot
     end
 
     def parse_operations_parameters
-
     end
 
     def parse_operations
@@ -214,7 +211,7 @@ module Isot
 
         message = @messages[port_message_type]
         port_message_part = message.children.find do |node|
-          soap_body_parts.nil? ? (node.name == "part") : ( node.name == "part" && node["name"] == soap_body_parts)
+          soap_body_parts.nil? ? (node.name == "part") : (node.name == "part" && node["name"] == soap_body_parts)
         end
 
         if port_message_part && port_message_part["element"]?
@@ -249,15 +246,27 @@ module Isot
     end
 
     def parse_types
+      debug("Parse types.")
+      schemas.each do |schema|
+        schema_namespace = schema.attributes["targetNamespace"].content unless schema.attributes.empty?
+        schema.children.each do |node|
+          namespace = schema_namespace || @namespace
 
+          case node.name
+          when "element"
+            complex_type = node.xpath_nodes("./xs:complexType", namespaces: {"xs": XSD})
+            process_type namespace, complex_type, node["name"].to_s if complex_type
+          when "complexType"
+            process_type namespace, node, node["name"].to_s
+          end
+        end
+      end
     end
 
     def process_type(namespace, type, name)
-
     end
 
     def parse_deferred_types
-
     end
 
     def schemas
@@ -267,7 +276,7 @@ module Isot
 
     def service
       services = section("service")
-      services.first? if services  # service nodes could be imported?
+      services.first? if services # service nodes could be imported?
     end
 
     def section(section_name)
