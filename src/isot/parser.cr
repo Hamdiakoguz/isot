@@ -79,7 +79,7 @@ module Isot
       @element_form_default = element_form_default.to_s if element_form_default
       debug("@element_form_default: #{@element_form_default}")
 
-      namespace = root["targetNamespace"]
+      namespace = root["targetNamespace"]?
       @namespace = namespace.to_s if namespace
       debug("@namespace: #{@namespace}")
 
@@ -91,8 +91,8 @@ module Isot
 
     def parse_endpoint
       if service_node = service
-        endpoint = service_node.xpath_node(".//soap11:address/@location", namespaces: {"soap11": SOAP_1_1})
-        endpoint ||= service_node.xpath_node(".//soap12:address/@location", namespaces: {"soap12": SOAP_1_2})
+        endpoint = service_node.xpath_nodes(".//soap11:address/@location", namespaces: {"soap11": SOAP_1_1}).first?
+        endpoint ||= service_node.xpath_nodes(".//soap12:address/@location", namespaces: {"soap12": SOAP_1_2}).first?
       end
 
       @endpoint = parse_url(endpoint.content) if endpoint
@@ -100,8 +100,7 @@ module Isot
 
     def parse_url(url)
       unescaped_url = URI.unescape(url.to_s)
-      escaped_url = URI.escape(unescaped_url)
-      URI.parse(escaped_url)
+      URI.parse(unescaped_url)
     rescue URI::Error
       URI.new
     end
@@ -286,7 +285,7 @@ module Isot
 
     def schemas
       types = section("types").try &.first?
-      types ? types.children : [] of XML::Node
+      types ? types.children.select { |c| c.element? } : [] of XML::Node
     end
 
     def service
