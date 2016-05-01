@@ -19,4 +19,9 @@ module Isot
   def self.debug(message, progname = "Isot")
     @@logger.not_nil!.debug(message, progname) if @@logger
   end
+
+  # Expects a WSDL document and returns a *Isot::Document*.
+  def self.document(document)
+    Document.new(document)
+  end
 end
