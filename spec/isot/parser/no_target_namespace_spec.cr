@@ -22,9 +22,9 @@ describe Isot::Parser do
     # Don"t know if real WSDL files omit targetNamespace from xs:schema,
     # but I suppose we should do something reasonable if they do.
 
-    # it "defaults to the target namespace from xs:definitions" do
-    #   subject.types["Save"][:namespace].should eq("http://def.example.com")
-    # end
+    it "defaults to the target namespace from xs:definitions" do
+      subject.types["Save"].namespace.should eq("http://def.example.com")
+    end
 
   end
 end

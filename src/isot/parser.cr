@@ -52,6 +52,8 @@ module Isot
       @messages = {} of String => XML::Node
       @port_types = {} of String => XML::Node
       @port_type_operations = {} of String => Hash(String, XML::Node)
+      @types = {} of String => ComplexType
+      @deferred_types = [] of Proc(Nil)
     end
 
     class Error < Exception
@@ -268,8 +270,10 @@ module Isot
 
           case node.name
           when "element"
-            complex_type = node.xpath_nodes("./xs:complexType", namespaces: {"xs": XSD})
-            process_type namespace, complex_type, node["name"].to_s if complex_type
+            complex_types = node.xpath_nodes("./xs:complexType", namespaces: {"xs": XSD})
+            complex_types.each do |complex_type|
+              process_type namespace, complex_type, node["name"].to_s
+            end
           when "complexType"
             process_type namespace, node, node["name"].to_s
           end
@@ -278,9 +282,58 @@ module Isot
     end
 
     def process_type(namespace, type, name)
+      @types[name] ||= ComplexType.new(name, namespace)
+
+      type.xpath_nodes("./xs:sequence/xs:element", namespaces: {"xs": XSD}).each do |inner|
+        element_name = inner["name"].to_s
+        element = Element.new(element_name, inner["type"]?)
+
+        {% for attr in [ "nillable", "minOccurs", "maxOccurs" ] %}
+          if v = inner[{{attr}}]?
+            element.{{attr.id}} = v.to_s
+          end
+        {% end %}
+
+        @types[name].elements << element
+      end
+
+      type.xpath_nodes(
+        "./xs:complexContent/xs:extension/xs:sequence/xs:element",
+        namespaces: {"xs": XSD}
+      ).each do |inner_element|
+        element_name = inner_element["name"].to_s
+        element = Element.new(element_name, inner_element["type"]?)
+
+        @types[name].elements << element
+      end
+
+      type.xpath_nodes("./xs:complexContent/xs:extension[@base]", namespaces: {"xs": XSD}).each do |inherits|
+        base_match = inherits["base"].to_s.match(/\w+$/)
+
+        if base_match
+          base = base_match[0]
+
+          if @types[base]?
+            # Insert base elements before sub-type elements
+            t = ComplexType.new(name, namespace, base)
+            t.elements = @types[base].elements + @types[name].elements
+            @types[name] = t
+          else
+            p = Proc(Nil).new do
+              if @types[base]?
+                t = ComplexType.new(name, namespace, base)
+                t.elements = @types[base].elements + @types[name].elements
+                @types[name] = t
+              end
+            end
+            deferred_types << p
+          end
+        end
+      end
     end
 
     def parse_deferred_types
+      deferred_types.each(&.call)
     end
 
     def schemas
@@ -347,6 +400,28 @@ module Isot
     getter element : String?
 
     def initialize(@name, @element = nil, @type = nil)
+    end
+  end
+
+  struct ComplexType
+    getter name : String
+    getter namespace : String
+    property base_type : String?
+    property elements : Array(Element)
+
+    def initialize(@name, @namespace, @base_type = nil)
+      @elements = [] of Element
+    end
+  end
+
+  struct Element
+    getter name : String
+    property type : String?
+    property nillable : String?
+    property minOccurs : String?
+    property maxOccurs : String?
+
+    def initialize(@name, @type = nil, @nillable = nil, @minOccurs = nil, @maxOccurs = nil)
     end
   end
 end

@@ -5,16 +5,12 @@ describe Isot::Parser do
 
     subject = fixture(:no_namespace).parse
 
-    # it "lists the types" do
-    #   subject.types.keys.sort.should eq(["McContact", "McContactArray", "MpUser", "MpUserArray"])
-    # end
+    it "lists the types" do
+      subject.types.keys.should eq(["MpUser", "MpUserArray", "McContact", "McContactArray"])
+    end
 
-    # it "ignores xsd:all" do
-    #   keys =  subject.types["MpUser"].keys
-    #   keys.size.should eq(2)
-
-    #   keys.includes?(:namespace).should be_true
-    #   keys.includes?(:order!).should be_true
-    # end
+    it "ignores xsd:all" do
+      keys =  subject.types["MpUser"].elements.size.should eq(0)
+    end
   end
 end

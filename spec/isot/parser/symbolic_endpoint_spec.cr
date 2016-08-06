@@ -5,10 +5,14 @@ describe Isot::Parser do
 
     subject = fixture(:symbolic_endpoint).parse
 
-    # it "should position base class attributes before subclass attributes in :order! array" do
-    #   type = subject.types["ROPtsLiesListe"]
-    #   type[:order!].should eq(["messages", "returncode", "listenteil"])
-    # end
+    it "allows symbolic endpoints" do
+      subject.endpoint.host.should eq(nil)
+    end
+
+    it "should position base class attributes before subclass attributes in elements array" do
+      type = subject.types["ROPtsLiesListe"]
+      type.elements.map(&.name).should eq(["messages", "returncode", "listenteil"])
+    end
 
   end
 end
