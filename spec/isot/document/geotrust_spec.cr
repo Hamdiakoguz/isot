@@ -20,15 +20,19 @@ describe Isot::Document do
       document.operations.size.should eq(2)
     end
 
-    # describe "#operations" do
-    #   subject { super().operations }
-    #   it do
-    #     should include(
-    #       { :get_quick_approver_list => { :input => "GetQuickApproverList", :action => "GetQuickApproverList", :parameters=>{:Request=>{:name=>"Request", :type=>"GetQuickApproverListInput"}}}},
-    #       { :hello => { :input => "hello", :action => "hello", :parameters=>{:Input=>{:name=>"Input", :type=>"string"}} } }
-    #       )
-    #   end
-    # end
+    describe "#operations" do
+      it "return operations" do
+        document.operations["get_quick_approver_list"].name.should eq("GetQuickApproverList")
+        document.operations["get_quick_approver_list"].action.should eq("GetQuickApproverList")
+        document.operations["get_quick_approver_list"].parameters.first.name.should eq("Request")
+        document.operations["get_quick_approver_list"].parameters.first.type.should eq("GetQuickApproverListInput")
+
+        document.operations["hello"].name.should eq("hello")
+        document.operations["hello"].action.should eq("hello")
+        document.operations["hello"].parameters.first.name.should eq("Input")
+        document.operations["hello"].parameters.first.type.should eq("string")
+      end
+    end
 
   end
 end
