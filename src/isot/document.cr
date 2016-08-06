@@ -27,6 +27,9 @@ module Isot
     # Returns the service name.
     getter service_name : String
 
+    @xml : String?
+    @parser : Parser?
+
     # Accepts a WSDL *document* to parse. *document* can be a file path, uri or xml content.
     def initialize(@document, endpoint = nil, namespace = nil, service_name = nil, element_form_default = nil)
       @soap_operations = [] of String
