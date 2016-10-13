@@ -147,7 +147,8 @@ module Isot
           if operation = @operations[name]?
             element.xpath_nodes("*[local-name() ='complexType']/*[local-name() ='sequence']/*[local-name() ='element']").each do |child_element|
               attr_name = child_element["name"].not_nil!
-              attr_type = (attr_type = child_element["type"].not_nil!.split(':')).size > 1 ? attr_type[1] : attr_type[0]
+              attr_type = child_element["type"].not_nil!.split(':')
+              attr_type = attr_type.size > 1 ? attr_type[1] : attr_type[0]
 
               operation.parameters << Parameter.new(attr_name, attr_type)
             end
