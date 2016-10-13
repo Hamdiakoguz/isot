@@ -35,18 +35,18 @@ describe Isot::Document do
       end
     end
 
-    # describe "#type_namespaces" do
-    #   subject { super().type_namespaces }
-    #   it do
-    #     should =~ [
-    #       [["Save"], "http://example.com/actions"],
-    #       [["Save", "article"], "http://example.com/actions"],
-    #       [["Article"], "http://example.com/article"],
-    #       [["Article", "Author"], "http://example.com/article"],
-    #       [["Article", "Title"], "http://example.com/article"]
-    #     ]
-    #   end
-    # end
+    describe "#type_namespaces" do
+      it "returns type namespaces" do
+        type_namespaces = document.type_namespaces
+        type_namespaces.should eq([
+          Isot::Document::TypeNamespace.new("Save", "http://example.com/actions"),
+          Isot::Document::TypeNamespace.new("Save", "http://example.com/actions", "article"),
+          Isot::Document::TypeNamespace.new("Article", "http://example.com/article"),
+          Isot::Document::TypeNamespace.new("Article", "http://example.com/article", "Author"),
+          Isot::Document::TypeNamespace.new("Article", "http://example.com/article", "Title")
+        ])
+      end
+    end
 
     # describe "#type_definitions" do
     #   subject { super().type_definitions }

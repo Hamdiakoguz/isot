@@ -29,6 +29,7 @@ module Isot
 
     @xml : String?
     @parser : Parser?
+    @type_namespaces : Array(TypeNamespace)?
 
     # Accepts a WSDL *document* to parse. *document* can be a file path, uri or xml content.
     def initialize(@document, endpoint = nil, namespace = nil, service_name = nil, element_form_default = nil)
@@ -86,6 +87,19 @@ module Isot
     end
 
     def type_namespaces
+      @type_namespaces ||= begin
+        namespaces = [] of TypeNamespace
+
+        parser.types.each do |key, value|
+          namespaces << TypeNamespace.new(value.name, value.namespace)
+
+          value.elements.each do |field|
+            namespaces << TypeNamespace.new(value.name, value.namespace, field.name)
+          end
+        end
+
+        namespaces
+      end.not_nil!
     end
 
     def type_definitions
@@ -117,6 +131,15 @@ module Isot
 
     private def element_keys(info)
       info.keys - [:namespace, :order!, :base_type]
+    end
+
+    struct TypeNamespace
+      getter type : String
+      getter field : String?
+      getter namespace : String
+
+      def initialize(@type, @namespace, @field = nil)
+      end
     end
   end
 end
