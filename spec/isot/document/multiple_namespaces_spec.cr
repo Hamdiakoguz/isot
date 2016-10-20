@@ -48,12 +48,13 @@ describe Isot::Document do
       end
     end
 
-    # describe "#type_definitions" do
-    #   subject { super().type_definitions }
-    #   it do
-    #     should =~ [ [["Save", "article"], "Article"] ]
-    #   end
-    # end
-
+    describe "#type_definitions" do
+      it "returns type definations" do
+        type_definitions = document.type_definitions
+        type_definitions.should eq([
+          Isot::Document::TypeDefinition.new("Save", "article", "Article"),
+        ])
+      end
+    end
   end
 end

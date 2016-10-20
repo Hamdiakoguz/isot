@@ -30,6 +30,7 @@ module Isot
     @xml : String?
     @parser : Parser?
     @type_namespaces : Array(TypeNamespace)?
+    @type_definitions : Array(TypeDefinition)?
 
     # Accepts a WSDL *document* to parse. *document* can be a file path, uri or xml content.
     def initialize(@document, endpoint = nil, namespace = nil, service_name = nil, element_form_default = nil)
@@ -103,6 +104,14 @@ module Isot
     end
 
     def type_definitions
+      @type_definitions ||= begin
+        namespaces = [] of TypeDefinition
+        parser.types.each do |key, value|
+          value.elements.each do |field|
+
+          end
+        end
+      end.not_nil!
     end
 
     # Returns whether the given *namespace* was defined manually.
@@ -139,6 +148,15 @@ module Isot
       getter namespace : String
 
       def initialize(@type, @namespace, @field = nil)
+      end
+    end
+
+    struct TypeDefinition
+      getter type : String
+      getter field : String?
+      getter tag : String
+
+      def initialize(@type, @namespace, @tag = nil)
       end
     end
   end
