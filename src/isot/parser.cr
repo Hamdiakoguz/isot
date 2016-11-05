@@ -139,16 +139,19 @@ module Isot
     end
 
     def parse_operations_parameters
+      debug("Parsing operations parameters")
       root_elements = document.xpath_nodes("wsdl:definitions/wsdl:types/*[local-name()='schema']/*[local-name()='element']", namespaces: {"wsdl": WSDL}).each do |element|
         name = element["name"]?
         if name
           name = Isot::CoreExt::String.snakecase(name)
 
           if operation = @operations[name]?
+            debug("Parsing parameters for #{name}")
             element.xpath_nodes("*[local-name() ='complexType']/*[local-name() ='sequence']/*[local-name() ='element']").each do |child_element|
               attr_name = child_element["name"].not_nil!
-              attr_type = child_element["type"].not_nil!.split(':')
+              attr_type = (child_element["type"]? || "").split(':')
               attr_type = attr_type.size > 1 ? attr_type[1] : attr_type[0]
+              debug("Parameter: #{attr_name} - #{attr_type}")
 
               operation.parameters << Parameter.new(attr_name, attr_type)
             end
