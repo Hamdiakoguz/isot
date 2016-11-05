@@ -24,7 +24,7 @@ module Isot
     # Returns the SOAP operations.
     getter operations : Hash(String, Operation)
 
-    # Returns a map from a type name to a Hash with type information.
+    # Returns a map from a type name to a ComplexType object with type information.
     getter types
 
     # Returns a map of deferred type Proc objects.
