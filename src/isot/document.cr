@@ -140,7 +140,7 @@ module Isot
     private def parse
       parser = Parser.new(XML.parse(xml))
       parser.parse
-      parser
+      @parser = parser
     end
 
     private def element_keys(info)
