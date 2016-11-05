@@ -105,13 +105,18 @@ module Isot
 
     def type_definitions
       @type_definitions ||= begin
-        namespaces = [] of TypeDefinition
+        definitions = [] of TypeDefinition
         parser.types.each do |key, value|
-          value.elements.each do |field|
-
+          value.elements.each do |element|
+            if element.type
+              field_type = element.type.not_nil!
+              tag, namespace = field_type.split(":").reverse
+              definitions << TypeDefinition.new(key, element.name, tag) if user_defined(namespace)
+            end
           end
         end
-      end.not_nil!
+        definitions
+      end
     end
 
     # Returns whether the given *namespace* was defined manually.
@@ -156,7 +161,7 @@ module Isot
       getter field : String?
       getter tag : String
 
-      def initialize(@type, @namespace, @tag = nil)
+      def initialize(@type, @field, @tag = nil)
       end
     end
   end
