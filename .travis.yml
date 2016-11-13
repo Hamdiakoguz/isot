@@ -1,1 +1,4 @@
 language: crystal
+addons:
+    code_climate:
+        repo_token: 4436e938f7b2c594b06e4aeba1ee02eec6614b2d08d29274bb457a905055fe0f
